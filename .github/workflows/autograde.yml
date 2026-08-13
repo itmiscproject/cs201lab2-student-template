@@ -1,0 +1,70 @@
+name: AutoGrade
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  grade:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Submit commit for grading
+        env:
+          REPOSITORY: ${{ github.repository }}
+          COMMIT_SHA: ${{ github.sha }}
+
+        run: |
+          response=$(curl --silent --show-error --fail-with-body \
+            -X POST \
+            "https://autograder.workautomate.cc/api/grade" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"assignment\": \"cs201lab2\",
+              \"repository\": \"$REPOSITORY\",
+              \"commit_sha\": \"$COMMIT_SHA\"
+            }")
+
+          echo "$response" | python -m json.tool
+
+          RESPONSE="$response" python - <<'PY'
+          import json
+          import os
+          import sys
+
+          result = json.loads(
+              os.environ["RESPONSE"]
+          )
+
+          score = result["score"]
+          max_score = result["max_score"]
+
+          print()
+          print(
+              f"AutoGrade result: "
+              f"{score}/{max_score}"
+          )
+          print()
+
+          for test in result["tests"]:
+
+              symbol = (
+                  "PASS"
+                  if test["passed"]
+                  else "FAIL"
+              )
+
+              print(
+                  f"{symbol}: "
+                  f"{test['name']} "
+                  f"({test['awarded']}/"
+                  f"{test['points']})"
+              )
+
+          if not result["passed"]:
+              sys.exit(1)
+          PY
