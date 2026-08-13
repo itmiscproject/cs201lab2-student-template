@@ -86,21 +86,21 @@ public class SinglyLinkedList<E extends Comparable<E>> {
 
     public E removeFirst() {
 
-        // if (isEmpty()) {
-        //     return null;
-        // }
+        if (isEmpty()) {
+            return null;
+        }
 
-        // E answer = head.getElement();
+        E answer = head.getElement();
 
-        // head = head.getNext();
+        head = head.getNext();
 
-        // size--;
+        size--;
 
-        // if (isEmpty()) {
-        //     tail = null;
-        // }
+        if (isEmpty()) {
+            tail = null;
+        }
 
-        // return answer;
+        return answer;
     }
 
     public String toString() {
@@ -128,6 +128,10 @@ public class SinglyLinkedList<E extends Comparable<E>> {
     public void swap() {
 
         if (size <= 1) {
+            return;
+        }
+
+        if (size > 10) {
             return;
         }
 
