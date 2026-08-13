@@ -28,7 +28,7 @@ public class SinglyLinkedList<E extends Comparable<E>> {
     }
 
     public SinglyLinkedList(){
-
+// what should i do?
     }
 
     public int size(){
